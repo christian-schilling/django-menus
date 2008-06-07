@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+import re
+from util.menus.node import MenuNode
+
+class MenuGenerator():
+    def node(self,path):
+        return False
+    def children(self,path):
+        return []
+    def parent(self,path):
+        return False
+
+class SimpleMenuGenerator(MenuGenerator):
+    def __init__(self):
+        self.nodes = {}
+    def additem(self,path,name,title):
+        self.nodes[path] = MenuNode(path,name,title) 
+
+    def node(self,path):
+        if self.nodes.has_key(path):
+            return self.nodes[path]
+    def children(self,path):
+        return [node for key,node in self.nodes.iteritems()
+                     if re.match(r'^'+path+r'\w+/?$',key)]
+    def parent(self,path):
+        return self.node(MenuNode(path).parentpath)
+
