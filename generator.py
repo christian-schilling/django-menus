@@ -8,7 +8,7 @@ class MenuGenerator():
     def children(self,path):
         return []
     def parent(self,path):
-        return False
+        return self.node(MenuNode(path).parentpath)
 
 class SimpleMenuGenerator(MenuGenerator):
     def __init__(self):
@@ -22,6 +22,4 @@ class SimpleMenuGenerator(MenuGenerator):
     def children(self,path):
         return [node for key,node in self.nodes.iteritems()
                      if re.match(r'^'+path+r'\w+/?$',key)]
-    def parent(self,path):
-        return self.node(MenuNode(path).parentpath)
 
