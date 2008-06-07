@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class MenuNode():
+class MenuNode:
     def __init__(self,path='',name='',title=''):
         self.pathlist = path.strip('/').split('/')
         self.name = name

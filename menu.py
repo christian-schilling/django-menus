@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class Menu():
+class Menu:
     def __init__(self):
         self.generators = []
 

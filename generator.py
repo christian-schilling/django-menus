@@ -2,7 +2,7 @@
 import re
 from util.menus.node import MenuNode
 
-class MenuGenerator():
+class MenuGenerator:
     def node(self,path):
         return False
     def children(self,path):
