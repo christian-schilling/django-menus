@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 class Menu:
-    def __init__(self):
+    def __init__(self,depth=1):
         self.generators = []
+        self.depth = depth
 
     def addgenerator(self,gen):
         self.generators += [gen]
