@@ -1,11 +1,20 @@
 # -*- coding: utf-8 -*-
 
+def my_import(name):
+    mod = __import__(name)
+    components = name.split('.')
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
 class Menu:
     def __init__(self,depth=1):
         self.generators = []
         self.depth = depth
 
     def addgenerator(self,gen):
+        if type(gen) == str:
+            gen = my_import(gen).generator
         self.generators += [gen]
 
     def node(self,path):
