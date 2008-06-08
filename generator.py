@@ -21,5 +21,5 @@ class SimpleMenuGenerator(MenuGenerator):
             return self.nodes[path]
     def children(self,path):
         return [node for key,node in self.nodes.iteritems()
-                     if re.match(r'^'+path+r'\w+/?$',key)]
+                     if re.match(r'^'+path+r'[\w-]+/?$',key)]
 
