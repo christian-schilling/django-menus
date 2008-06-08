@@ -13,8 +13,8 @@ class MenuGenerator:
 class SimpleMenuGenerator(MenuGenerator):
     def __init__(self):
         self.nodes = {}
-    def additem(self,path,name,title):
-        self.nodes[path] = MenuNode(path,name,title) 
+    def additem(self,path,name,title,in_menu=True):
+        self.nodes[path] = MenuNode(path,name,title,in_menu) 
 
     def node(self,path):
         if self.nodes.has_key(path):

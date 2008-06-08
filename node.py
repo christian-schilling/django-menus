@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 class MenuNode:
-    def __init__(self,path='',name='',title=''):
+    def __init__(self,path='',name='',title='',in_menu=True):
         self.pathlist = path.strip('/').split('/')
         self.name = name
         self.title = title
         self.active = self.open = False
+        self.in_menu = in_menu
     def __unicode__(self):
         return u'%s - %s' %(self.name,self.path)
     __str__ = __unicode__
