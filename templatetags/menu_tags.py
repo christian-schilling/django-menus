@@ -16,13 +16,13 @@ def menu(context):
 def node(context,n,depth=1):
     curpath = context['request'].path
     branch = main_menu.branch(curpath)
-    children = [x for x in main_menu.children(n.path) if x.in_menu]
     n.open = n.active = n.path in branch
-    for c in children:
-        n.active &= (c.path not in branch)
     if not n.open or depth >= main_menu.depth:
         context.update({'children':[]})
     else:
+        children = [x for x in main_menu.children(n.path) if x.in_menu]
+        for c in children:
+            n.active &= (c.path not in branch)
         context.update({'children':children})
     context.update({'node':n,'depth':depth+1})
     return context
