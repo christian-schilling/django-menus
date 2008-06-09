@@ -8,8 +8,8 @@ register = template.Library()
 def menu(context):
     curpath = context['request'].path
     pathstart = MenuNode(curpath).pathstart
-    context.update({'nodes':[x for x in main_menu.children(pathstart)
-                            if x.in_menu]})
+    context.update({'nodes':(x for x in main_menu.children(pathstart)
+                            if x.in_menu)})
     return context
 
 @register.inclusion_tag('menus/node.html',takes_context=True)

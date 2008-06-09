@@ -6,7 +6,7 @@ class MenuNode:
                  show_contents=False,heading=False):
         self.pathlist = path.strip('/').split('/')
         self.name = name
-        self.title = title
+        self.title = title or name
         self.active = self.open = False
         self.in_menu = in_menu
         self.in_index = in_index

@@ -13,7 +13,7 @@ class MenuGenerator:
 class SimpleMenuGenerator(MenuGenerator):
     def __init__(self):
         self.nodes = {}
-    def additem(self,path,name,title,in_menu=True):
+    def additem(self,path,name,title=False,in_menu=True):
         self.nodes[path] = MenuNode(path,name,title,in_menu) 
 
     def node(self,path):
