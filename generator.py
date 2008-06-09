@@ -6,7 +6,7 @@ class MenuGenerator:
     def node(self,path):
         return False
     def children(self,path):
-        return []
+        return ()
     def parent(self,path):
         return self.node(MenuNode(path).parentpath)
 
@@ -20,6 +20,6 @@ class SimpleMenuGenerator(MenuGenerator):
         if self.nodes.has_key(path):
             return self.nodes[path]
     def children(self,path):
-        return [node for key,node in self.nodes.iteritems()
-                     if re.match(r'^'+path+r'[\w-]+/?$',key)]
+        return (node for key,node in self.nodes.iteritems()
+                     if re.match(r'^'+path+r'[\w-]+/?$',key))
 

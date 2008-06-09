@@ -9,13 +9,13 @@ def my_import(name):
 
 class Menu:
     def __init__(self,depth=1):
-        self.generators = []
+        self.generators = ()
         self.depth = depth
 
     def addgenerator(self,gen):
         if type(gen) == str:
             gen = my_import(gen).generator
-        self.generators += [gen]
+        self.generators += (gen,)
 
     def node(self,path):
         for gen in self.generators:
@@ -34,5 +34,5 @@ class Menu:
         return c
 
     def branch(self,path):
-        li = [p for p in path.split('/') if p]
-        return ['/']+['/'+'/'.join(li[:c])+'/' for c in range(1,len(li)+1)]
+        li = tuple(p for p in path.split('/') if p)
+        return ('/',)+tuple('/'+'/'.join(li[:c])+'/' for c in range(1,len(li)+1))

@@ -18,9 +18,9 @@ def node(context,n,depth=1):
     branch = main_menu.branch(curpath)
     n.open = n.active = n.path in branch
     if not n.open or depth >= main_menu.depth:
-        context.update({'children':[]})
+        context.update({'children':()})
     else:
-        children = [x for x in main_menu.children(n.path) if x.in_menu]
+        children = tuple(x for x in main_menu.children(n.path) if x.in_menu)
         for c in children:
             n.active &= (c.path not in branch)
         context.update({'children':children})
@@ -38,7 +38,7 @@ def breadcrumbs(context):
 @register.inclusion_tag('menus/tabbar.html',takes_context=True)
 def tabbar(context):
     curpath = context['request'].path
-    nodes = [x for x in main_menu.children('/') if x.in_menu]
+    nodes = tuple(x for x in main_menu.children('/') if x.in_menu)
     pathstart = MenuNode(curpath).pathstart
     for node in nodes:
         node.active = node.path == pathstart
