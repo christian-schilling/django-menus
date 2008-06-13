@@ -12,9 +12,10 @@ class Menu:
         self.generators = ()
         self.depth = depth
 
-    def addgenerator(self,gen):
+    def addgenerator(self,gen,offset=0):
         if type(gen) == str:
             gen = my_import(gen).generator
+        gen.offset = offset
         self.generators += (gen,)
 
     def node(self,path):
@@ -31,6 +32,7 @@ class Menu:
         c = []
         for gen in self.generators:
             c += gen.children(path)
+        c.sort(lambda x,y:x.position-y.position)
         return c
 
     def branch(self,path):
