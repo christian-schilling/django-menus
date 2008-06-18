@@ -3,14 +3,41 @@ import re
 from util.menus import MenuNode
 
 class MenuGenerator:
+    """
+    This is the interface class every menu generator is
+    required to implement.
+    For most generators it should be sufficent to implement
+    the "node" and "children" methods, as the "parent" implementation
+    just depends on "node" and thus should work just automaticly.
+    """
 
     def node(self,path):
+        """
+        This should return a MenuNode instance corresponding to
+        the given path. If no node is found "False" should be returned
+        and no exceptions should ever be raised.
+        """
         return False
 
     def children(self,path):
+        """
+        This should return a tuple containing MenuNode instances
+        corresponding to all nodes that could have a parent with "path".
+        No checking needs to be done, verifing that a node corresponding to
+        "path" itself exists.
+        If no children are found an empty tuple should be retured and no exceptions
+        should ever be raised.
+        """
         return ()
         
     def parent(self,path):
+        """
+        This should return a MenuNode instance refering to the node
+        that would be the parent of a node with the given path, even if the node
+        with that given path does not exist.
+        The default implementation should do the job in most cases so this
+        method will rarly -if ever- be needed to be overwritten.
+        """
         return self.node(MenuNode(path).parentpath)
 
 class SimpleMenuGenerator(MenuGenerator):

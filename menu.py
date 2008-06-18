@@ -4,7 +4,7 @@ def my_import(name):
     """
     This is taken directly from the Python documentation.
     It is a thin wrapper around the buildin __import__
-    function that that returns "eggs" instead of "span" when
+    function that that returns "eggs" instead of "spam" when
     importing "spam.eggs"
     """
     mod = __import__(name)
@@ -47,18 +47,34 @@ class Menu:
 
     def node(self,path):
         """
-
+        Finds the MenuNode for a given path by asking all
+        MenuGenerator instances.
+        If multiple generators have a node for the given path the
+        fist match is returned.
         """
         for gen in self.generators:
             n = gen.node(path)
             if n: return n
 
     def parent(self,path):
+        """
+        Finds the MenuNode beeing the parent of the node
+        at the given path.
+        This succedes even if no node exists with the given path, as
+        long as a node could be the parent of the (nonexistent) node.
+        If multiple generators have a node for the given path the
+        fist match is returned.
+        """
         for gen in self.generators:
             n = gen.parent(path)
             if n: return n
 
     def children(self,path):
+        """
+        Builds a list of all MenuNode instances having a parent with the given path.
+        The list is build by gathering the nodes from all generators and
+        sorting them by position afterwards.
+        """
         c = []
         for gen in self.generators:
             c += gen.children(path)
@@ -66,5 +82,13 @@ class Menu:
         return c
 
     def branch(self,path):
+        """
+        Builds a tuple containing all path above this one.
+        None of the returned paths or the given paths is required to
+        actually have a corresponding MenuNode.
+        Expample:
+        >>> Menu().branch('/a/b/c/')
+        ('/', '/a/', '/a/b/', '/a/b/c/')
+        """
         li = tuple(p for p in path.split('/') if p)
         return ('/',)+tuple('/'+'/'.join(li[:c])+'/' for c in range(1,len(li)+1))
