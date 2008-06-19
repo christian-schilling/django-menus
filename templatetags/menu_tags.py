@@ -17,7 +17,7 @@ def node(context,n,depth=1):
     curpath = context['request'].path
     branch = main_menu.branch(curpath)
     n.open = n.active = n.path in branch
-    if not n.open or depth >= main_menu.depth:
+    if not n.open or depth > main_menu.depth:
         context.update({'children':()})
     else:
         children = tuple(x for x in main_menu.children(n.path) if x.in_menu)
