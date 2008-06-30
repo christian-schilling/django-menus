@@ -23,7 +23,7 @@ class Menu:
     def __init__(self,depth=1):
         """
         Just initializes self.generators as an empty tuple.
-        May take "depth" with is the number of levels of menu hierarchy
+        May take "depth" witch is the number of levels of menu hierarchy
         that should be shown when the menu is rendered.
         """
         self.generators = ()
