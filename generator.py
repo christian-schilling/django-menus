@@ -41,7 +41,15 @@ class MenuGenerator:
         return self.node(MenuNode(path).parentpath)
 
 class SimpleMenuGenerator(MenuGenerator):
+    """
+    This implements the MenuGenerator interface by storing
+    the menu in a python dictonary.
 
+    The dict keys are the paths and the values are tuples containing
+    data to build MenuNode instances from.
+    The MenuNode instances are created on-demand and are not
+    permanently stored.
+    """
     def __init__(self):
         self.nodes = {}
         self.offset = 0
