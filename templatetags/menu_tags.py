@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import template
 from util.menus import MenuNode,main_menu
+from copy import copy
 
 register = template.Library()
 
@@ -14,10 +15,11 @@ def menu(context):
 
 @register.inclusion_tag('menus/node.html',takes_context=True)
 def node(context,n,depth=1):
+    context = copy(context)
     curpath = context['request'].path
     branch = main_menu.branch(curpath)
     n.open = n.active = n.path in branch
-    if not n.open or depth > main_menu.depth:
+    if not n.open or depth >= main_menu.depth:
         context.update({'children':()})
     else:
         children = tuple(x for x in main_menu.children(n.path) if x.in_menu)
