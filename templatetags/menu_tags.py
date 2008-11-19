@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import template
-from util.menus import MenuNode,main_menu
+from menus import MenuNode,main_menu
 from copy import copy
 
 register = template.Library()

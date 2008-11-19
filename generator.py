@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
-from util.menus import MenuNode
+from menus import MenuNode
 
 class MenuGenerator:
     """
