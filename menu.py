@@ -20,14 +20,21 @@ class Menu:
     It holds a list of references to MenuGenerator instances and its interface methods
     just "merge" the results of the corresponding MenuGenerator method together.
     """
+    generators = []
     def __init__(self,depth=1):
         """
         Just initializes self.generators as an empty tuple.
         May take "depth" witch is the number of levels of menu hierarchy
         that should be shown when the menu is rendered.
         """
-        self.generators = ()
         self.depth = depth
+        tmp = self.generators
+        self.generators = []
+        for gen in tmp:
+            if isinstance(gen,str):
+                self.addgenerator(gen)
+            elif isinstance(gen,tuple):
+                self.addgenerator(*gen)
 
     def addgenerator(self,gen,offset=0):
         """
@@ -40,10 +47,10 @@ class Menu:
         "offset" is a value that is to be added to the position of every MenuNode
         of the generator before sorting them.
         """
-        if type(gen) == str:
+        if isinstance(gen,str):
             gen = my_import(gen).generator
         gen.offset = offset
-        self.generators += (gen,)
+        self.generators.append(gen)
 
     def node(self,path):
         """
@@ -78,6 +85,7 @@ class Menu:
         c = []
         for gen in self.generators:
             c += gen.children(path)
+        c.sort(lambda x,y:-1 if x.path < y.path else 1)
         c.sort(lambda x,y:x.position-y.position)
         return c
 

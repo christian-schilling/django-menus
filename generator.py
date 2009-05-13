@@ -50,20 +50,24 @@ class SimpleMenuGenerator(MenuGenerator):
     The MenuNode instances are created on-demand and are not
     permanently stored.
     """
+    nodes = []
+    offset = 0
+
     def __init__(self):
-        self.nodes = {}
-        self.offset = 0
+        self.nodes_dict = dict([(n.path,n) for n in self.nodes])
 
     def additem(self,path,name,title=False,in_menu=True,position=0):
-        self.nodes[path] = (path,name,title,in_menu,position) 
+        self.nodes_dict[path] = (path,name,title,in_menu,position) 
 
     def node(self,path):
-        if self.nodes.has_key(path):
-            n = self.nodes[path]
+        if self.nodes_dict.has_key(path):
+            n = self.nodes_dict[path]
+            if isinstance(n,MenuNode):
+                return n
             return MenuNode(position=n[4]+self.offset,*n[:-1])
 
     def children(self,path):
-        return (MenuNode(position=n[4]+self.offset,*n[:-1])
-                     for key,n in self.nodes.iteritems()
-                     if re.match(r'^'+path+r'[\w-]+/?$',key))
+        return (self.node(key)
+                    for key,n in self.nodes_dict.iteritems()
+                    if re.match(r'^'+path+r'[\w-]+/?$',key))
 
