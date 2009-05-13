@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django import template
+from django.conf import settings
 from menus import MenuNode,main_menu
 from copy import copy
 
@@ -35,6 +36,25 @@ def breadcrumbs(context):
     branchnodes = (main_menu.node(x) or MenuNode(x)
                    for x in main_menu.branch(curpath)[1:])
     context.update({'branch':branchnodes,})
+    return context
+
+@register.inclusion_tag('menus/image.html',takes_context=True)
+def menu_image(context):
+    curpath = context['request'].path
+    branchnodes = (main_menu.node(x) or MenuNode(x)
+                   for x in reversed(main_menu.branch(curpath)))
+    image = None
+
+    for x in reversed(main_menu.branch(curpath)):
+        node = main_menu.node(x) or MenuNode(x)
+        if node.image:
+            image = node.image
+            break
+
+    if not image:
+        image = settings.MENUS_DEFAULT_IMAGE
+
+    context.update({'menu_image':image,})
     return context
 
 @register.inclusion_tag('menus/tabbar.html',takes_context=True)
