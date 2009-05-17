@@ -54,16 +54,14 @@ class SimpleMenuGenerator(MenuGenerator):
     offset = 0
 
     def __init__(self):
-        self.nodes_dict = dict([(n.path,n) for n in self.nodes])
+        self.nodes_dict = dict([(n.path,(n.path,n.name,n.title,n.in_menu,n.position)) for n in self.nodes])
 
     def additem(self,path,name,title=False,in_menu=True,position=0):
-        self.nodes_dict[path] = (path,name,title,in_menu,position) 
+        self.nodes_dict[path] = (path,name,title,in_menu,position)
 
     def node(self,path):
         if self.nodes_dict.has_key(path):
             n = self.nodes_dict[path]
-            if isinstance(n,MenuNode):
-                return n
             return MenuNode(position=n[4]+self.offset,*n[:-1])
 
     def children(self,path):
