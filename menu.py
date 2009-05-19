@@ -35,6 +35,8 @@ class Menu:
                 self.addgenerator(gen)
             elif isinstance(gen,tuple):
                 self.addgenerator(*gen)
+            else:
+                self.addgenerator(gen)
 
     def addgenerator(self,gen,offset=0):
         """
