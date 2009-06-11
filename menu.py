@@ -54,6 +54,9 @@ class Menu:
         gen.offset = offset
         self.generators.append(gen)
 
+    def register(self,genclass):
+        self.addgenerator(genclass())
+
     def node(self,path):
         """
         Finds the MenuNode for a given path by asking all
