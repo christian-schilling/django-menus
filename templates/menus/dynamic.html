@@ -1,0 +1,8 @@
+{% spaceless %}
+    <li class="{{ classes }}">
+    <a href="{{ node.path }}">{{ node.name }}</a>
+    {% if children.all_of_current %}
+        <ul>{% for child in children.all_of_current %}{{ child }}{% endfor %}</ul>
+    {% endif %}
+    </li>
+{% endspaceless %}

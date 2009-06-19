@@ -1,80 +1,64 @@
 # -*- coding: utf-8 -*-
 from django import template
-from django.conf import settings
-from menus import MenuNode,site_menu
-from copy import copy
+from django.utils.safestring import mark_safe
+import menus
 
 register = template.Library()
 
-@register.inclusion_tag('menus/menu.html',takes_context=True)
-def menu(context):
-    curpath = context['request'].path
-    pathstart = MenuNode(curpath).pathstart
-    context.update({'nodes':(x for x in site_menu.children(pathstart)
-                            if x.in_menu)})
-    return context
+def parse_ttag(token):
+    """
+    allows for easy parsing of templatetag options.
+    see: http://ericholscher.com/blog/2008/nov/8/problem-django-template-tags/
+    """
+    bits = token.split_contents()
+    tags = {}
+    possible_tags = ['from', 'limit', 'template',]
+    for index, bit in enumerate(bits):
+        if bit.strip() in possible_tags:
+            tags[bit.strip()] = bits[index+1]
+    return tags
 
-@register.inclusion_tag('menus/node.html',takes_context=True)
-def node(context,n,depth=1):
-    context = copy(context)
-    curpath = context['request'].path
-    branch = site_menu.branch(curpath)
-    n.open = n.active = n.path in branch
-    if not n.open or depth >= site_menu.depth:
-        context.update({'children':()})
-    else:
-        children = tuple(x for x in site_menu.children(n.path) if x.in_menu)
-        for c in children:
-            n.active &= (c.path not in branch)
-        context.update({'children':children})
-    context.update({'node':n,'depth':depth+1})
-    return context
+def render_menu_node(path,branch,limit,template_name):
+    children = menus.site.children(path)
 
-@register.inclusion_tag('menus/breadcrumbs.html',takes_context=True)
-def breadcrumbs(context):
-    curpath = context['request'].path
-    branchnodes = (site_menu.node(x) or MenuNode(x)
-                   for x in site_menu.branch(curpath)[1:])
-    context.update({'branch':branchnodes,})
-    return context
+    return template.loader.render_to_string(template_name,{
+        'node':menus.site.node(path),
+        'classes':'open active' if path in branch[-1:] else 'open' if path in branch else '',
+        'children':{
+            'all':
+                (render_menu_node(n.path,branch,limit-1,template_name) for n in children)
+                    if children and limit > 0 else [],
+            'all_of_current':
+                (render_menu_node(n.path,branch,limit-1,template_name) for n in children)
+                    if children and limit > 0 and path in branch else [],
+            'only_current':
+                (render_menu_node(n.path,branch,limit-1,template_name) for n in children
+                    if children and n.path in branch) if limit > 0 else [],
+        }
+    })
 
-@register.inclusion_tag('menus/image.html',takes_context=True)
-def menu_image(context):
-    curpath = context['request'].path
-    branchnodes = (site_menu.node(x) or MenuNode(x)
-                   for x in reversed(site_menu.branch(curpath)))
-    image = None
+class MenuTagNode(template.Node):
+    def __init__(self,options):
+        self.start_path = template.Variable(options.pop('from','0'))
+        self.limit = template.Variable(options.pop('limit','9999'))
+        self.template = template.Variable(options.pop('template','"menus/full.html"'))
 
-    for x in reversed(site_menu.branch(curpath)):
-        node = site_menu.node(x) or MenuNode(x)
-        if node.image:
-            image = node.image
-            break
+    def render(self,context):
+        branch = menus.helpers.branch(context['request'].path)
 
-    if not image:
-        image = settings.MENUS_DEFAULT_IMAGE
+        start_path = self.start_path.resolve(context)
+        if isinstance(start_path,int):
+            start_index = start_path
+            start_path = branch[start_path]
+        else:
+            start_index = len(menus.helpers.branch(start_path))-1
 
-    context.update({'menu_image':image,})
-    return context
+        limit = self.limit.resolve(context)
+        template = self.template.resolve(context)
 
-@register.inclusion_tag('menus/tabbar.html',takes_context=True)
-def tabbar(context):
-    curpath = context['request'].path
-    nodes = tuple(x for x in site_menu.children('/') if x.in_menu)
-    pathstart = MenuNode(curpath).pathstart
-    for node in nodes:
-        node.active = node.path == pathstart
-    context.update({'nodes':nodes})
-    return context
+        return render_menu_node(start_path,branch[start_index:start_index+limit+1],limit,template)
 
-@register.inclusion_tag('menus/contents.html',takes_context=True)
-def contents(context):
-    curpath = context['request'].path
-    branch = site_menu.branch(curpath)
-    for x in reversed(branch):
-        node = site_menu.node(x)
-        if node and node.show_contents:
-            context.update({'rootnode':node,'nodes':site_menu.children(x)})
-            break
-    return context
+@register.tag('menu')
+def do_menu_node(parser,token):
+    return MenuTagNode(parse_ttag(token))
 

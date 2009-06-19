@@ -1,10 +1,8 @@
-from menus.menu import *
+from menus.site import *
 from menus.node import *
-from menus.generator import *
+from menus.menu import *
 
-site_menu = Menu()
-tmp_generator = SimpleMenuGenerator()
-site_menu.addgenerator(tmp_generator)
+site = MenuSite()
 
 def autodiscover():
     import imp

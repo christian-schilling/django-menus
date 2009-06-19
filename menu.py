@@ -1,107 +1,65 @@
 # -*- coding: utf-8 -*-
 
-def my_import(name):
+class Menu(object):
     """
-    This is taken directly from the Python documentation.
-    It is a thin wrapper around the buildin __import__
-    function that that returns "eggs" instead of "spam" when
-    importing "spam.eggs"
+    This is the interface class every menu is
+    required to implement.
+    For most menus it should be sufficent to implement
+    the "node" and "children" methods, as the "parent" implementation
+    just depends on "node" and thus should work just automaticly.
     """
-    mod = __import__(name)
-    components = name.split('.')
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
-
-class Menu:
-    """
-    This class is the high-level interface of the menugen application.
-    Is is used in places where the menu should be rendered (by the templatetags).
-    It holds a list of references to MenuGenerator instances and its interface methods
-    just "merge" the results of the corresponding MenuGenerator method together.
-    """
-    generators = []
-    def __init__(self,depth=1):
-        """
-        Just initializes self.generators as an empty tuple.
-        May take "depth" witch is the number of levels of menu hierarchy
-        that should be shown when the menu is rendered.
-        """
-        self.depth = depth
-        tmp = self.generators
-        self.generators = []
-        for gen in tmp:
-            if isinstance(gen,str):
-                self.addgenerator(gen)
-            elif isinstance(gen,tuple):
-                self.addgenerator(*gen)
-            else:
-                self.addgenerator(gen)
-
-    def addgenerator(self,gen,offset=0):
-        """
-        Adds a MenuGenerator instance "gen" to the references list.
-        If "gen" is a already initialized instance of MenuGenerator, it is
-        is added directly.
-        If it is a string, the module specified in it is imported and the contained
-        instance is added. The module specified should contain such an instance
-        just named "generator"
-        "offset" is a value that is to be added to the position of every MenuNode
-        of the generator before sorting them.
-        """
-        if isinstance(gen,str):
-            gen = my_import(gen).generator
-        gen.offset = offset
-        self.generators.append(gen)
-
-    def register(self,genclass):
-        self.addgenerator(genclass())
 
     def node(self,path):
         """
-        Finds the MenuNode for a given path by asking all
-        MenuGenerator instances.
-        If multiple generators have a node for the given path the
-        fist match is returned.
+        This should return a Node instance corresponding to
+        the given path. If no node is found "False" should be returned
+        and no exceptions should ever be raised.
         """
-        for gen in self.generators:
-            n = gen.node(path)
-            if n: return n
-
-    def parent(self,path):
-        """
-        Finds the MenuNode beeing the parent of the node
-        at the given path.
-        This succedes even if no node exists with the given path, as
-        long as a node could be the parent of the (nonexistent) node.
-        If multiple generators have a node for the given path the
-        fist match is returned.
-        """
-        for gen in self.generators:
-            n = gen.parent(path)
-            if n: return n
+        return False
 
     def children(self,path):
         """
-        Builds a list of all MenuNode instances having a parent with the given path.
-        The list is build by gathering the nodes from all generators and
-        sorting them by position afterwards.
+        This should return a tuple containing Node instances
+        corresponding to all nodes that could have a parent with "path".
+        No checking needs to be done, verifing that a node corresponding to
+        "path" itself exists.
+        If no children are found an empty tuple should be retured and no exceptions
+        should ever be raised.
         """
-        c = []
-        for gen in self.generators:
-            c += gen.children(path)
-        c.sort(lambda x,y:-1 if x.path < y.path else 1)
-        c.sort(lambda x,y:x.position-y.position)
-        return c
+        return ()
 
-    def branch(self,path):
+    def parent(self,path):
         """
-        Builds a tuple containing all path above this one.
-        None of the returned paths or the given paths is required to
-        actually have a corresponding MenuNode.
-        Expample:
-        >>> Menu().branch('/a/b/c/')
-        ('/', '/a/', '/a/b/', '/a/b/c/')
+        This should return a Node instance refering to the node
+        that would be the parent of a node with the given path, even if the node
+        with that given path does not exist.
+        The default implementation should do the job in most cases so this
+        method will rarly -if ever- be needed to be overwritten.
         """
-        li = tuple(p for p in path.split('/') if p)
-        return ('/',)+tuple('/'+'/'.join(li[:c])+'/' for c in range(1,len(li)+1))
+        if path == "/": return None
+        return self.node(path.rstrip("/").rsplit("/",1)[0] + "/")
+
+class SimpleMenu(Menu):
+    """
+    This implements the Menu interface by storing
+    the menu in a python dictonary.
+
+    The dict keys are the paths and the values are tuples containing
+    data to build Node instances from.
+    The Node instances are created on-demand and are not
+    permanently stored.
+    """
+    nodes = []
+
+    def __init__(self):
+        self.nodes_dict = dict([(n.path,n) for n in self.nodes])
+
+    def addnode(self,node):
+        self.nodes_dict[node.path] = node
+
+    def node(self,path):
+        if self.nodes_dict.has_key(path):
+            return self.nodes_dict[path]
+
+    def children(self,path):
+        return (n for n in self.nodes_dict.values() if n.parentpath == path)
