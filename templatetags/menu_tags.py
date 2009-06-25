@@ -18,24 +18,25 @@ def parse_ttag(token):
             tags[bit.strip()] = bits[index+1]
     return tags
 
-def render_menu_node(path,branch,limit,template_name):
+def render_menu_node(path,branch,limit,template_name,nodecontext):
     children = menus.site.children(path)
-
-    return template.loader.render_to_string(template_name,{
+    nodecontext.update({
         'node':menus.site.node(path),
         'classes':'open active' if path in branch[-1:] else 'open' if path in branch else '',
         'children':{
             'all':
-                (render_menu_node(n.path,branch,limit-1,template_name) for n in children)
+                (render_menu_node(n.path,branch,limit-1,template_name,nodecontext) for n in children)
                     if children and limit > 0 else [],
             'all_of_current':
-                (render_menu_node(n.path,branch,limit-1,template_name) for n in children)
+                (render_menu_node(n.path,branch,limit-1,template_name,nodecontext) for n in children)
                     if children and limit > 0 and path in branch else [],
             'only_current':
-                (render_menu_node(n.path,branch,limit-1,template_name) for n in children
+                (render_menu_node(n.path,branch,limit-1,template_name,nodecontext) for n in children
                     if children and n.path in branch) if limit > 0 else [],
+            'nodes': children if limit > 0 else [],
         }
     })
+    return template.loader.render_to_string(template_name,nodecontext)
 
 class MenuTagNode(template.Node):
     def __init__(self,options):
@@ -56,7 +57,7 @@ class MenuTagNode(template.Node):
         limit = self.limit.resolve(context)
         template = self.template.resolve(context)
 
-        return render_menu_node(start_path,branch[start_index:start_index+limit+1],limit,template)
+        return render_menu_node(start_path,branch[start_index:start_index+limit+1],limit,template,context)
 
 @register.tag('menu')
 def do_menu_node(parser,token):
