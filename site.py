@@ -28,6 +28,10 @@ class MenuSite(object):
         """
         self.menus.append((menuclass(),offset))
 
+    def setoffset(self,menuclass,newoffset):
+        self.menus = [(obj,offset) if not isinstance(obj,menuclass) else (obj,newoffset)
+                        for (obj,offset) in self.menus]
+
     def node(self,path):
         """
         Finds the Node for a given path by asking all

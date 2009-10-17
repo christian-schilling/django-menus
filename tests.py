@@ -92,6 +92,9 @@ class MenuTestCase(TestCase):
         from menus.site import MenuSite
         site = MenuSite()
         site.register(TestMenu)
+        self.assertEqual(site.menus[0][1],0)
+        site.setoffset(TestMenu,1)
+        self.assertEqual(site.menus[0][1],1)
 
         self.assertEqual(site.node("/").name,"Rootnode")
         self.assertEqual(site.node("/first1/").name,"First1")
