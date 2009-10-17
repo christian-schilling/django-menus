@@ -1,6 +1,8 @@
 {% spaceless %}
-    <li class="{{ classes }}">
-    <a href="{{ node.path }}">{{ node.name }}</a>
-    </li>
+    {% if node %}
+        <li class="{{ classes }}">
+        <a href="{{ node.path }}">{{ node.name }}</a>
+        </li>
+    {% endif  %}
     {% for child in children.only_current %}{{ child }}{% endfor %}
 {% endspaceless %}
