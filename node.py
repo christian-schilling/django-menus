@@ -15,3 +15,7 @@ class Node:
         self.name = name
         self.options = kwargs
         self.branch = helpers.branch(path)
+
+    def set_position(self, position):
+        self.position = position
+        return self
