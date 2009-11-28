@@ -63,8 +63,12 @@ class MenuSite(object):
         sorting them by position afterwards.
         """
         c = []
+        upaths = set([])
         for menu,offset in self.menus:
-            c += [(node,node.position+offset) for node in menu.children(path)]
+            for node in menu.children(path):
+                if not node.path in upaths:
+                    c.append((node,node.position+offset))
+                    upaths.add(node.path)
         c.sort(lambda x,y:-1 if x[0].path < y[0].path else 1)
         c.sort(lambda x,y:x[1]-y[1])
         return [x[0] for x in c]
