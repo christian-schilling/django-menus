@@ -14,11 +14,16 @@ class MenuSite(object):
         """
         tmp = self.menus
         self.menus = []
+        self.name_overrides = {}
         for menu in tmp:
             if isinstance(menu,tuple):
                 self.register(*menu)
             else:
                 self.register(menu)
+
+    def apply_name_override(self,node):
+        node.name = self.name_overrides.get(node.path,node.name)
+        return node
 
     def register(self,menuclass,offset=0):
         """
@@ -41,7 +46,7 @@ class MenuSite(object):
         """
         for menu,offset in self.menus:
             n = menu.node(path)
-            if n: return n
+            if n: return self.apply_name_override(n)
 
     def parent(self,path):
         """
@@ -54,7 +59,7 @@ class MenuSite(object):
         """
         for menu,offset in self.menus:
             n = menu.parent(path)
-            if n: return n
+            if n: return self.apply_name_override(n)
 
     def children(self,path):
         """
@@ -71,5 +76,5 @@ class MenuSite(object):
                     upaths.add(node.path)
         c.sort(lambda x,y:-1 if x[0].path < y[0].path else 1)
         c.sort(lambda x,y:x[1]-y[1])
-        return [x[0] for x in c]
+        return [self.apply_name_override(x[0]) for x in c]
 
