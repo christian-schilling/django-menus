@@ -20,8 +20,10 @@ def parse_ttag(token):
 
 def render_menu_node(path,branch,limit,template_name,nodecontext):
     children = menus.site.children(path)
+    node = menus.site.node(path)
+    always_open = node.options.get('always_open',False)
     nodecontext.update({
-        'node':menus.site.node(path),
+        'node':node,
         'classes':'open active' if path in branch[-1:] else 'open' if path in branch else '',
         'children':{
             'all':
@@ -29,7 +31,7 @@ def render_menu_node(path,branch,limit,template_name,nodecontext):
                     if children and limit > 0 else [],
             'all_of_current':
                 (render_menu_node(n.path,branch,limit-1,template_name,nodecontext) for n in children)
-                    if children and limit > 0 and path in branch else [],
+                    if children and limit > 0 and ((path in branch)or(always_open)) else [],
             'only_current':
                 (render_menu_node(n.path,branch,limit-1,template_name,nodecontext) for n in children
                     if children and n.path in branch) if limit > 0 else [],
