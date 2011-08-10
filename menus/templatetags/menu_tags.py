@@ -47,6 +47,8 @@ class MenuTagNode(template.Node):
         self.template = template.Variable(options.pop('template','"menus/full.html"'))
 
     def render(self,context):
+        if not 'request' in context:
+            return "Error: Need request-context"
         branch = menus.helpers.branch(context['request'].path)
 
         start_path = self.start_path.resolve(context)
