@@ -21,6 +21,7 @@ def parse_ttag(token):
 def render_menu_node(path,branch,limit,template_name,nodecontext):
     children = menus.site.children(path)
     node = menus.site.node(path)
+    if not node: return ''
     always_open = node.options.get('always_open',False)
     nodecontext.update({
         'node':node,
