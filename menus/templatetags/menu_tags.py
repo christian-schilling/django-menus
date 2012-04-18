@@ -55,7 +55,8 @@ class MenuTagNode(template.Node):
         start_path = self.start_path.resolve(context)
         if isinstance(start_path,int):
             start_index = start_path
-            start_path = branch[start_path]
+            if start_index > len(branch) -1: return ''
+            start_path = branch[start_index]
         else:
             start_index = len(menus.helpers.branch(start_path))-1
 
