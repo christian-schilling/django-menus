@@ -17,6 +17,6 @@ setup(
         "Topic :: Software Development"
     ],
     packages=[ 'menus','menus.templatetags' ],
-    package_data={'menus':'templates/menus/*.html'},
+    package_data={'menus':['templates/menus/*.html']},
 )
 
